@@ -1,25 +1,39 @@
 package com.lingoware.lingow.buswatch;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    GoogleMap mMap;
+    private MapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpMapIfNeeded();
+        setupSlidingPanel();
+
+    }
+
+    private void setupSlidingPanel() {
+        SlidingUpPanelLayout panel =
+                ((SlidingUpPanelLayout) findViewById(R.id.activity_main_sliding_layout));
+        panel.setShadowHeight(40);
     }
 
     @Override
@@ -45,31 +59,63 @@ public class MainActivity extends FragmentActivity {
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        if (mMapFragment == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
+            mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+            mMapFragment.getMapAsync(this);
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
     private void setUpMap() {
         Location loc = getIntent().getParcelableExtra("LOCATION");
         LatLng position = new LatLng(loc.getLatitude(), loc.getLongitude());
         mMap.addMarker(new MarkerOptions().position(position).title("Marker"));
-        CameraUpdate center =
+        final CameraUpdate center =
                 CameraUpdateFactory.newLatLng(position);
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
         mMap.moveCamera(center);
-        mMap.animateCamera(zoom);
+        mMap.animateCamera(zoom, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                mMap.moveCamera(center);
+            }
+
+            @Override
+            public void onCancel() {
+                mMap.moveCamera(center);
+            }
+        });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if (mMap == null)
+            mMap = googleMap;
+        setUpMap();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        /* TODO: Descomentar esto si es que tendremos Settings
+
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_activity_main, menu);
+
+        */
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
