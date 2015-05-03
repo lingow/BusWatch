@@ -64,7 +64,7 @@ public class ActivityLoading extends FragmentActivity implements GoogleApiClient
 
     private void invokeNextActivity() {
         Intent intent = new Intent(ActivityLoading.this, MainActivity.class);
-        intent.putExtra("LOCATION", mLastLocation);
+        intent.putExtra(MainActivity.LOCATION, mLastLocation);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

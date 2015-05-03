@@ -3,10 +3,14 @@ package com.lingoware.lingow.buswatch;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,23 +21,49 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, AdapterView.OnItemClickListener {
 
+
+    public static final String LOCATION = "com.lingoware.lingow.buswatch.MainActivity.LOCATION";
     GoogleMap mMap;
+    SlidingUpPanelLayout panel;
+    Location location;
+    NonSwipeableViewPager routePager;
+    boolean duringcheckin = false;
     private MapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupSlidingPanel();
+        if (location == null) {
+            location = getIntent().getParcelableExtra(LOCATION);
+        }
+        if (location == null && savedInstanceState != null) {
+            location = savedInstanceState.getParcelable(LOCATION);
+        }
+        if (location == null) {
 
+        }
+
+        setupSlidingPanel();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putParcelable(LOCATION, location);
     }
 
     private void setupSlidingPanel() {
-        SlidingUpPanelLayout panel =
-                ((SlidingUpPanelLayout) findViewById(R.id.activity_main_sliding_layout));
-        panel.setShadowHeight(40);
+        panel = ((SlidingUpPanelLayout) findViewById(R.id.activity_main_sliding_layout));
+        panel.setTouchEnabled(false);
+        RouteFragmentAdapter routeFragmentAdapter = new RouteFragmentAdapter(getSupportFragmentManager());
+        routePager = ((NonSwipeableViewPager) findViewById(R.id.route_scroller));
+        routePager.setAdapter(routeFragmentAdapter);
+        RouteFetcher routeFetcher = new RouteFetcher(routeFragmentAdapter);
+        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+        routeFetcher.execute(position);
     }
 
     @Override
@@ -67,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void setUpMap() {
-        Location loc = getIntent().getParcelableExtra("LOCATION");
-        LatLng position = new LatLng(loc.getLatitude(), loc.getLongitude());
+        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.addMarker(new MarkerOptions().position(position).title("Marker"));
         final CameraUpdate center =
                 CameraUpdateFactory.newLatLng(position);
@@ -116,6 +145,43 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnAddRoute:
+                Intent i = new Intent(this, NewRouteActivity.class);
+                startActivity(i);
+                break;
+            case R.id.btnCheckin:
+                FloatingActionButton fab = (FloatingActionButton) v;
+                if (!duringcheckin) {
+                    panel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                    panel.setTouchEnabled(true);
+                    routePager.setPagingEnabled(false);
+                    duringcheckin = true;
+                } else {
+                    panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    routePager.setPagingEnabled(true);
+                    panel.setTouchEnabled(false);
+                    duringcheckin = false;
+                }
+            default:
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        switch (parent.getId()) {
+            case R.id.routelist_view:
+                if (routePager != null) {
+                    routePager.setCurrentItem(position + 1);
+                    /*TODO Set this routes's poliline in the map */
+                }
+                break;
+            default:
         }
     }
 }

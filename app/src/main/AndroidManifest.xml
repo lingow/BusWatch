@@ -41,7 +41,15 @@
             android:label="@string/title_activity_main" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".NewRouteActivity"
+            android:label="@string/title_activity_new_route"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lingoware.lingow.buswatch.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
