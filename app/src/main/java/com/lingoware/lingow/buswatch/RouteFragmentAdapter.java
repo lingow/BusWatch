@@ -3,6 +3,8 @@ package com.lingoware.lingow.buswatch;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +20,16 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
     List<RouteFragment> routesList = new ArrayList<RouteFragment>();
     AllRoutesFragment allRoutesFragment;
 
+    SparseArray<RouteFragment> registeredFragments = new SparseArray<RouteFragment>();
+
     public RouteFragmentAdapter(FragmentManager fm) {
         super(fm);
         allRoutesFragment = AllRoutesFragment.newInstance();
         add(-1, allRoutesFragment);
+    }
+
+    private static String makeFragmentName(int viewId, int index) {
+        return "android:switcher:" + viewId + ":" + index;
     }
 
     @Override
@@ -34,11 +42,11 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
         return routes.size();
     }
 
-    private boolean add(Route r) {
+    private boolean add(Route r, int color) {
         if (routes.containsKey(r.getId())) {
             return false;
         }
-        return add(r.getId(), RouteFragment.newInstance(r));
+        return add(r.getId(), RouteFragment.newInstance(r, color));
     }
 
     private boolean add(int id, RouteFragment f) {
@@ -48,10 +56,10 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
     }
 
     @Override
-    public void routesUpdated(List<Route> routes) {
-        allRoutesFragment.routesUpdated(routes);
-        for (Route r : routes) {
-            add(r);
+    public void routesUpdated(List<Route> routes, int colors[]) {
+        allRoutesFragment.routesUpdated(routes, colors);
+        for (int i = 0; i < routes.size(); i++) {
+            add(routes.get(i), colors[i]);
         }
         notifyDataSetChanged();
     }
@@ -59,5 +67,22 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
     @Override
     public int getItemPosition(Object object) {
         return POSITION_NONE;
+    }
+
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        RouteFragment fragment = (RouteFragment) super.instantiateItem(container, position);
+        registeredFragments.put(position, fragment);
+        return fragment;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        registeredFragments.remove(position);
+        super.destroyItem(container, position, object);
+    }
+
+    public RouteFragment getRegisteredFragment(int position) {
+        return registeredFragments.get(position);
     }
 }

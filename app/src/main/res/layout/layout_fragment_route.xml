@@ -9,48 +9,215 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="@dimen/bottomPaneHeight"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btnCheckin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="16dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 fab:fab_colorNormal="@android:color/holo_green_dark"
                 fab:fab_colorPressed="@android:color/holo_green_light"
                 fab:fab_icon="@android:drawable/ic_media_play" />
-        </LinearLayout>
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnCheckout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:visibility="invisible"
+                fab:fab_colorNormal="@android:color/holo_blue_dark"
+                fab:fab_colorPressed="@android:color/holo_blue_light"
+                fab:fab_icon="@android:drawable/ic_media_pause" />
+
+            <TextView
+                android:id="@+id/txtCheckIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btnCheckin"
+                android:layout_centerHorizontal="true"
+                android:text="CheckIn"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="4dp">
 
             <TextView
                 android:id="@+id/txtRouteName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Route"
+                android:text="RouteName"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/starsRouteRating"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:stepSize="0.5" />
+
+            <ListView
+                android:id="@+id/nearbyUnitsList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></ListView>
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/txtReviewTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Evaluate the Route"
-            android:textAlignment="center"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingTop="4dp"
+            android:text="Route&apos;s Review"
             android:textSize="@dimen/abc_text_size_headline_material" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/serviceStars"
+                android:layout_toStartOf="@+id/serviceStars"
+                android:text="Service"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/serviceStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:stepSize="1" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/comfortStars"
+                android:layout_toStartOf="@+id/comfortStars"
+                android:text="Comfort"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/comfortStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:stepSize="1" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/conditionStars"
+                android:layout_toStartOf="@+id/conditionStars"
+                android:text="Condition"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/conditionStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:stepSize="1" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/SecurityStars"
+                android:layout_toStartOf="@+id/SecurityStars"
+                android:text="Security"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/SecurityStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/overallStars"
+                android:layout_toStartOf="@+id/overallStars"
+                android:text="Overall"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <RatingBar
+                android:id="@+id/overallStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txtReviewMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" />
+
     </LinearLayout>
+
 </LinearLayout>

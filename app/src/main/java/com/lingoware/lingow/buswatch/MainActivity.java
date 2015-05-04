@@ -1,27 +1,40 @@
 package com.lingoware.lingow.buswatch;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, AdapterView.OnItemClickListener {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
+        View.OnClickListener, AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener,
+        GoogleMap.OnMarkerDragListener, RouteFetcher.RouteUpdateListener {
 
 
     public static final String LOCATION = "com.lingoware.lingow.buswatch.MainActivity.LOCATION";
@@ -30,23 +43,61 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Location location;
     NonSwipeableViewPager routePager;
     boolean duringcheckin = false;
+    Marker marker;
+    RouteFragment currentRouteFragment;
+    BitmapDescriptor[] buses;
+    int selectedRoutePage;
+    RouteFragmentAdapter routeFragmentAdapter;
+    LocationLoader loader;
     private MapFragment mMapFragment;
+    private List<Route> routes;
+    private int[] routecolors;
+
+    boolean mapset() {
+        return marker != null;
+    }
+
+    boolean mapready() {
+        return mMap != null;
+    }
+
+    boolean locationready() {
+        return location != null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (location == null) {
-            location = getIntent().getParcelableExtra(LOCATION);
+        loader = new LocationLoader(this);
+        loadCurrentLocation(savedInstanceState);
+    }
+
+    private void loadCurrentLocation(Bundle savedInstanceState) {
+        location = getIntent().getParcelableExtra(LOCATION);
+        if (location != null) {
+            setupSlidingPanel();
+            return;
         }
-        if (location == null && savedInstanceState != null) {
+
+        if (savedInstanceState != null) {
             location = savedInstanceState.getParcelable(LOCATION);
         }
-        if (location == null) {
 
+        if (location != null) {
+            setupSlidingPanel();
+            return;
         }
 
-        setupSlidingPanel();
+        loader.getSingle(new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                MainActivity.this.location = location;
+                MainActivity.this.setupSlidingPanel();
+                MainActivity.this.trySetupMap();
+            }
+        });
+
     }
 
     @Override
@@ -58,18 +109,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setupSlidingPanel() {
         panel = ((SlidingUpPanelLayout) findViewById(R.id.activity_main_sliding_layout));
         panel.setTouchEnabled(false);
-        RouteFragmentAdapter routeFragmentAdapter = new RouteFragmentAdapter(getSupportFragmentManager());
+        routeFragmentAdapter = new RouteFragmentAdapter(getSupportFragmentManager());
         routePager = ((NonSwipeableViewPager) findViewById(R.id.route_scroller));
         routePager.setAdapter(routeFragmentAdapter);
-        RouteFetcher routeFetcher = new RouteFetcher(routeFragmentAdapter);
-        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-        routeFetcher.execute(position);
+        routePager.setOnPageChangeListener(this);
+        reloadSlidingPanel(new LatLng(location.getLatitude(), location.getLongitude()));
+    }
+
+    private void reloadSlidingPanel(LatLng pos) {
+        RouteFetcher routeFetcher = new RouteFetcher(routeFragmentAdapter, this);
+        routeFetcher.execute(pos);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        trySetupMap();
     }
 
     /**
@@ -87,18 +142,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
      * method in {@link #onResume()} to guarantee that it will be called.
      */
-    private void setUpMapIfNeeded() {
+    private void trySetupMap() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMapFragment == null) {
+        if (!mapready()) {
             // Try to obtain the map from the SupportMapFragment.
             mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
             mMapFragment.getMapAsync(this);
+        }
+        if (!mapset() && locationready() && mapready()) {
+            setUpMap();
         }
     }
 
     private void setUpMap() {
         LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(position).title("Marker"));
+        marker = mMap.addMarker(new MarkerOptions().position(position).title("Check Routes Here").draggable(true));
+        mMap.setOnMarkerDragListener(this);
         final CameraUpdate center =
                 CameraUpdateFactory.newLatLng(position);
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
@@ -114,13 +173,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.moveCamera(center);
             }
         });
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         if (mMap == null)
             mMap = googleMap;
-        setUpMap();
+        trySetupMap();
     }
 
     @Override
@@ -150,26 +210,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onClick(View v) {
+        FloatingActionButton fabCheckout;
+        FloatingActionButton fabCheckin;
+
         switch (v.getId()) {
             case R.id.btnAddRoute:
                 Intent i = new Intent(this, NewRouteActivity.class);
                 startActivity(i);
                 break;
             case R.id.btnCheckin:
-                FloatingActionButton fab = (FloatingActionButton) v;
-                if (!duringcheckin) {
-                    panel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-                    panel.setTouchEnabled(true);
-                    routePager.setPagingEnabled(false);
-                    duringcheckin = true;
-                } else {
-                    panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                    routePager.setPagingEnabled(true);
-                    panel.setTouchEnabled(false);
-                    duringcheckin = false;
-                }
+                fabCheckin = (FloatingActionButton) v;
+                panel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                routePager.setPagingEnabled(false);
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtCheckIn))
+                        .setText("CheckOut");
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewTitle))
+                        .setText("Please Rate the Route");
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewMessage))
+                        .setText("Review will be sent upon checkout");
+                fabCheckin.setEnabled(false);
+                fabCheckin.setVisibility(View.INVISIBLE);
+                fabCheckin.invalidate();
+
+                fabCheckout = ((FloatingActionButton) currentRouteFragment.getView()
+                        .findViewById(R.id.btnCheckout));
+                fabCheckout.setEnabled(true);
+                fabCheckout.setVisibility(View.VISIBLE);
+                fabCheckout.invalidate();
+
+                loader.startUpdates(new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        MainActivity.this.location = location;
+                        MainActivity.this.marker.setPosition(
+                                new LatLng(location.getLatitude(), location.getLongitude()));
+                    }
+                });
+
+                currentRouteFragment.setModificableRatingBars(currentRouteFragment.getView(), true);
+
+                //TODO use colored bus markers
+
+                duringcheckin = true;
+
+                break;
+            case R.id.btnCheckout:
+                fabCheckout = (FloatingActionButton) v;
+                panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                routePager.setPagingEnabled(true);
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtCheckIn))
+                        .setText("CheckIn");
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewTitle))
+                        .setText("Route's Rating");
+                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewMessage))
+                        .setText("");
+                fabCheckout.setEnabled(false);
+                fabCheckout.setVisibility(View.INVISIBLE);
+                fabCheckout.invalidate();
+
+                fabCheckin = ((FloatingActionButton) currentRouteFragment.getView()
+                        .findViewById(R.id.btnCheckin));
+                fabCheckin.setEnabled(true);
+                fabCheckin.setVisibility(View.VISIBLE);
+                fabCheckin.invalidate();
+                currentRouteFragment.setModificableRatingBars(currentRouteFragment.getView(), false);
+
+                loader.stopUpdates();
+
+                marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                duringcheckin = false;
+
             default:
         }
+    }
+
+    private BitmapDescriptor coloredBusIcon(int i) {
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_bus);
+        Paint p = new Paint(routecolors[i]);
+        return null;
     }
 
     @Override
@@ -183,5 +301,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
             default:
         }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        selectedRoutePage = position;
+        currentRouteFragment = routeFragmentAdapter.getRegisteredFragment(position);
+        switch (position) {
+            case 0:
+                panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                panel.setTouchEnabled(false);
+                break;
+            default:
+                panel.setTouchEnabled(true);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        LatLng p = marker.getPosition();
+        location.setLatitude(p.latitude);
+        location.setLongitude(p.longitude);
+        reloadSlidingPanel(p);
+    }
+
+    @Override
+    public void routesUpdated(List<Route> routes, int colors[]) {
+        this.routes = routes;
+        routecolors = colors;
+        generateBuses();
+        //TODO Falta agregar la informacion de las rutas al mapa, junto con los camioncitos
+    }
+
+    private void generateBuses() {
+        //TODO Falta generar iconos de autobuses de distintos colores para cada ruta
     }
 }

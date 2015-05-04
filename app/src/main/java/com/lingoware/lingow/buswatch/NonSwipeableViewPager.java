@@ -38,4 +38,5 @@ public class NonSwipeableViewPager extends ViewPager {
     public void setPagingEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
 }

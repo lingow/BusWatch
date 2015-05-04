@@ -22,7 +22,8 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
 
     private static final String ROUTES = "com.lingoware.lingow.buswatch.AllRoutesFragment.ROUTES";
     RouteItemAdapter routeListadapter;
-    ArrayList<Route> routes;
+    ArrayList<Route> routes = new ArrayList<Route>();
+    private int[] colors;
 
     public AllRoutesFragment() {
         // Required empty public constructor
@@ -47,7 +48,7 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
         } else {
             routes = getArguments().getParcelableArrayList(ROUTES);
         }
-        routeListadapter = new RouteItemAdapter(this.getActivity(), android.R.layout.simple_list_item_1, routes);
+        routeListadapter = new RouteItemAdapter(this.getActivity(), routes, colors);
         listView.setAdapter(routeListadapter);
         Button btnNewRoute = new Button(getActivity());
         btnNewRoute.setText(R.string.addNewRouteButtonText);
@@ -66,8 +67,11 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
     }
 
     @Override
-    public void routesUpdated(List<Route> routes) {
-        routeListadapter.routesUpdated(routes);
+    public void routesUpdated(List<Route> routes, int colors[]) {
+        if (routeListadapter != null) {
+            routeListadapter.routesUpdated(routes, colors);
+        }
+        this.colors = colors;
         this.routes.clear();
         this.routes.addAll(routes);
     }

@@ -34,11 +34,11 @@ public class RouteFetcher extends AsyncTask<LatLng, Integer, List<Route>> {
     protected void onPostExecute(List<Route> routes) {
         super.onPostExecute(routes);
         for (RouteUpdateListener l : listeners) {
-            l.routesUpdated(routes);
+            l.routesUpdated(routes, ColorGenerator.generateColors(routes.size()));
         }
     }
 
     public interface RouteUpdateListener {
-        public void routesUpdated(List<Route> routes);
+        public void routesUpdated(List<Route> routes, int colors[]);
     }
 }
