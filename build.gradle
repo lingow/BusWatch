@@ -17,3 +17,5 @@ allprojects {
         jcenter()
     }
 }
+
+task stage(dependsOn: [':buswatchserver:compileJava'])
