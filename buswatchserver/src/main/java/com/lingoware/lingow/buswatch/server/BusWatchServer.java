@@ -13,7 +13,6 @@ public class BusWatchServer {
         System.out.println("Puerto " + port);
 
         System.setProperty("com.sun.net.httpserver.HttpServerProvider", JettyHttpServer.class.getName());
-
         Server server = new Server(port);
         JettyHttpServer jettyServer = new JettyHttpServer(server, true);
         ContextHandlerCollection collection = new ContextHandlerCollection();
