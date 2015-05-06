@@ -8,6 +8,7 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':common')
-    compile 'org.eclipse.jetty:jetty-server:9.0.0.RC2'
-    compile 'org.eclipse.jetty:jetty-servlet:9.0.0.RC2'
+    compile 'org.eclipse.jetty:jetty-server:9.+'
+    compile 'org.eclipse.jetty:jetty-servlet:9.+'
+    compile 'org.eclipse.jetty:jetty-http-spi:9.+'
 }
