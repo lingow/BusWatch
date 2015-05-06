@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import com.lingoware.lingow.buswatch.R;
+import com.lingoware.lingow.buswatch.app.beans.Route;
 
 import java.util.ArrayList;
 import java.util.List;

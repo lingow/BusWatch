@@ -1,8 +1,9 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.lingoware.lingow.buswatch.app.beans.Route;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,15 +3,15 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.lingoware.lingow.buswatch.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.lingoware.lingow.buswatch.app.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.lingoware.lingow.buswatch.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="com.lingoware.lingow.buswatch.app.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="com.lingoware.lingow.buswatch.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="com.lingoware.lingow.buswatch.app.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
 </preference-headers>

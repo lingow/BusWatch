@@ -1,9 +1,11 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.lingoware.lingow.buswatch.R;
 
 
 public class NewRouteActivity extends ActionBarActivity {

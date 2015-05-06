@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -16,6 +16,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+
+import com.lingoware.lingow.buswatch.R;
 
 import java.util.List;
 

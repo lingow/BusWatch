@@ -1,6 +1,8 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.os.Looper;
+
+import com.lingoware.lingow.buswatch.BuildConfig;
 
 /**
  * Created by lingow on 3/05/15.

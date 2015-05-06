@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.app.Activity;
 import android.location.Location;

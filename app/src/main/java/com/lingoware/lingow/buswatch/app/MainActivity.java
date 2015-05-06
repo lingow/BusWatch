@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.lingoware.lingow.buswatch.R;
+import com.lingoware.lingow.buswatch.app.beans.Route;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.List;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleMap.OnMarkerDragListener, RouteFetcher.RouteUpdateListener {
 
 
-    public static final String LOCATION = "com.lingoware.lingow.buswatch.MainActivity.LOCATION";
+    public static final String LOCATION = "com.lingoware.lingow.buswatch.app.MainActivity.LOCATION";
     GoogleMap mMap;
     SlidingUpPanelLayout panel;
     Location location;

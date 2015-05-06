@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 /**
  * TODO: Hay que Modificar Estos Comentarios Default

@@ -1,1 +1,8 @@
-include ':app', ':buswatchserver', ':common'
+//include ':app', ':common', ':buswatchserver'
+
+
+if (System.getenv()['DYNO']) {
+    include ':common', ':buswatchserver'
+} else {
+    include ':app', ':common', ':buswatchserver'
+}

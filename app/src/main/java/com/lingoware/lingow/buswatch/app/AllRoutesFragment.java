@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 
 import android.os.Bundle;
@@ -11,6 +11,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.lingoware.lingow.buswatch.R;
+import com.lingoware.lingow.buswatch.app.beans.Route;
+
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +25,7 @@ import java.util.List;
  */
 public class AllRoutesFragment extends RouteFragment implements RouteFetcher.RouteUpdateListener {
 
-    private static final String ROUTES = "com.lingoware.lingow.buswatch.AllRoutesFragment.ROUTES";
+    private static final String ROUTES = "com.lingoware.lingow.buswatch.app.AllRoutesFragment.ROUTES";
     RouteItemAdapter routeListadapter;
     ArrayList<Route> routes = new ArrayList<Route>();
     private int[] colors;
@@ -44,9 +49,17 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
 
         ListView listView = (ListView) v.findViewById(R.id.routelist_view);
         if (savedInstanceState != null) {
-            routes = savedInstanceState.getParcelableArrayList(ROUTES);
+            ArrayList<Parcelable> parcelables = savedInstanceState.getParcelableArrayList(ROUTES);
+            routes.clear();
+            for (Parcelable p : parcelables) {
+                routes.add((Route) Parcels.unwrap(p));
+            }
         } else {
-            routes = getArguments().getParcelableArrayList(ROUTES);
+            ArrayList<Parcelable> parcelables = getArguments().getParcelableArrayList(ROUTES);
+            routes.clear();
+            for (Parcelable p : parcelables) {
+                routes.add((Route) Parcels.unwrap(p));
+            }
         }
         routeListadapter = new RouteItemAdapter(this.getActivity(), routes, colors);
         listView.setAdapter(routeListadapter);
@@ -79,7 +92,11 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(ROUTES, routes);
+        ArrayList<Parcelable> parcelables = new ArrayList<Parcelable>();
+        for (Route r : routes) {
+            parcelables.add(Parcels.wrap(r));
+        }
+        outState.putParcelableArrayList(ROUTES, parcelables);
 
     }
 }

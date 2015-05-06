@@ -12,13 +12,13 @@
         android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.lingoware.lingow.buswatch.MainActivity"
+        tools:context="com.lingoware.lingow.buswatch.app.MainActivity"
         tools:layout="@layout/activity_main" />
 
-    <com.lingoware.lingow.buswatch.NonSwipeableViewPager
+    <com.lingoware.lingow.buswatch.app.NonSwipeableViewPager
         android:id="@+id/route_scroller"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></com.lingoware.lingow.buswatch.NonSwipeableViewPager>
+        android:layout_height="wrap_content"></com.lingoware.lingow.buswatch.app.NonSwipeableViewPager>
 
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

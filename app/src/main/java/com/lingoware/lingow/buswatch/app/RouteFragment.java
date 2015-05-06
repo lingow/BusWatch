@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -13,6 +13,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.lingoware.lingow.buswatch.R;
+import com.lingoware.lingow.buswatch.app.beans.Route;
+
+import org.parceler.Parcels;
 
 /**
  * Created by lingow on 2/05/15.
@@ -20,8 +24,8 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 public class RouteFragment extends Fragment {
 
 
-    private static final String RUTA = "com.lingoware.lingow.buswatch.RouteFragment.ROUTE";
-    private static final String COLOR = "com.lingoware.lingow.buswatch.RouteFragment.COLOR";
+    private static final String RUTA = "com.lingoware.lingow.buswatch.app.RouteFragment.ROUTE";
+    private static final String COLOR = "com.lingoware.lingow.buswatch.app.RouteFragment.COLOR";
 
     int ratingStarsIds[] = {
             R.id.starsRouteRating,
@@ -39,7 +43,7 @@ public class RouteFragment extends Fragment {
     public static RouteFragment newInstance(Route r, int c) {
         RouteFragment f = new RouteFragment();
         Bundle b = new Bundle();
-        b.putParcelable(RUTA, r);
+        b.putParcelable(RUTA, Parcels.wrap(r));
         b.putInt(COLOR, c);
         f.setArguments(b);
         return f;
@@ -52,7 +56,7 @@ public class RouteFragment extends Fragment {
         Route r;
         int color = Color.BLACK;
         color = getArguments().getInt(COLOR);
-        r = getArguments().getParcelable(RUTA);
+        r = Parcels.unwrap(getArguments().getParcelable(RUTA));
         if (r == null) {
             r = savedInstanceState.getParcelable(RUTA);
         }

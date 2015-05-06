@@ -1,8 +1,10 @@
 package com.lingoware.lingow.buswatch.server;
 
+import javax.xml.ws.Endpoint;
+
 public class BusWatchServer {
 
     public static void main(String args[]) {
-        System.out.println("This will be the server Endpoint some day");
+        Endpoint.publish("http://localhost:" + System.getenv("PORT") + "/", new BusWatchServiceImplementor());
     }
 }

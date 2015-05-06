@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ActivityLoading"
+            android:name=".app.ActivityLoading"
             android:label="@string/app_name"
             android:noHistory="true">
             <intent-filter>
@@ -37,18 +37,18 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".app.MainActivity"
             android:label="@string/title_activity_main" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".app.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".NewRouteActivity"
+            android:name=".app.NewRouteActivity"
             android:label="@string/title_activity_new_route"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".app.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.lingoware.lingow.buswatch.MainActivity" />
+                android:value=".app.MainActivity" />
         </activity>
     </application>
 

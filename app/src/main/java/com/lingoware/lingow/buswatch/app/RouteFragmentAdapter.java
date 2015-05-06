@@ -1,10 +1,12 @@
-package com.lingoware.lingow.buswatch;
+package com.lingoware.lingow.buswatch.app;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
+
+import com.lingoware.lingow.buswatch.app.beans.Route;
 
 import java.util.ArrayList;
 import java.util.HashMap;
