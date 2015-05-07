@@ -11,6 +11,7 @@ public class BusWatchServer {
     public static void main(String args[]) throws Exception {
         int port = Integer.parseInt(System.getenv("PORT"));
         System.out.println("Puerto " + port);
+        System.setProperty("org.eclipse.jetty.LEVEL","DEBUG");
 
         System.setProperty("com.sun.net.httpserver.HttpServerProvider", JettyHttpServer.class.getName());
         Server server = new Server(port);

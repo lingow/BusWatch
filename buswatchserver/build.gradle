@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'jetty'
 
 repositories {
     mavenCentral()
@@ -11,4 +10,11 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-server:9.2.+'
     compile 'org.eclipse.jetty:jetty-servlet:9.2.+'
     compile 'org.eclipse.jetty:jetty-http-spi:9.2.+'
+}
+
+task(runServer, dependsOn: 'classes', type: JavaExec) {
+    main = "com.lingoware.lingow.buswatch.server.BusWatchServer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    standardOutput = System.out
 }
