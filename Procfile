@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp `cat .classpath` com.lingoware.lingow.buswatch.server.BusWatchServer
+web: ./gradlew runServer

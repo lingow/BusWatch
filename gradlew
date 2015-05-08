@@ -12,6 +12,9 @@ DEFAULT_JVM_OPTS=""
 APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
+if [ -z -z ${DYNO+x} ]; then
+    export GRADLE_USER_HOME=./
+fi
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
 
