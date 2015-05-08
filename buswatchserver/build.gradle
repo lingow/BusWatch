@@ -1,4 +1,4 @@
-apply plugin: 'jetty'
+apply plugin: 'java'
 
 repositories {
     mavenCentral()
