@@ -18,4 +18,4 @@ allprojects {
     }
 }
 
-task stage(dependsOn: [':buswatchserver:compileJava'])
+task stage(dependsOn: 'classes')
