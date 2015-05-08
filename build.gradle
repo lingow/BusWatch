@@ -19,4 +19,4 @@ allprojects {
     }
 }
 
-task stage(dependsOn: [':buswatchserver:build'])
+task stage(dependsOn: [':buswatchserver:build', ':buswatchserver:printClasspath'])

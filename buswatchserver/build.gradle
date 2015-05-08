@@ -16,3 +16,8 @@ task(runServer, dependsOn: 'classes', type: JavaExec) {
     main = 'com.lingoware.lingow.buswatch.server.BusWatchServer'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task(printClasspath) {
+    File file = new File('.classpath')
+    file.text = sourceSets.main.runtimeClasspath.getAsPath()
+}
