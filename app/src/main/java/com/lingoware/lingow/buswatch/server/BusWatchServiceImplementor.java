@@ -1,6 +1,6 @@
 package com.lingoware.lingow.buswatch.server;
 
-import com.lingoware.lingow.buswatch.common.BusWatchService;
+import com.lingoware.lingow.buswatch.common.service.BusWatchService;
 import com.lingoware.lingow.buswatch.common.beans.Route;
 import com.lingoware.lingow.buswatch.common.util.LatLng;
 
@@ -25,17 +25,18 @@ public class BusWatchServiceImplementor implements BusWatchService {
         return ret;
     }
 
+    @Override
+    public boolean addRoute(String name, LatLng latLng) {
+        return false;
+    }
+
     private boolean inRouteRange(double range, LatLng position, Route r) {
-        LatLng lastpos = null;
-        boolean back = false;
         for (LatLng latLng : r.getRoutePoints()) {
-            if (lastpos != null) {
-                back = pointInRangeOfLine(range, position, lastpos, latLng);
-                if (back) return back;
+            if ( range > distanceInMeters(position, latLng)) {
+                return true;
             }
-            lastpos = latLng;
         }
-        return back;
+        return false;
     }
 
     private boolean pointInRangeOfLine(double range, LatLng P, LatLng A, LatLng B) {
@@ -83,7 +84,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = earthRadius * c;
 
-        int meterConversion = 1609;
+        int meterConversion = 1000;
 
         return new Float(distance * meterConversion).floatValue();
     }

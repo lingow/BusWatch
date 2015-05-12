@@ -1,4 +1,4 @@
-package com.lingoware.lingow.buswatch.common;
+package com.lingoware.lingow.buswatch.common.service;
 
 import com.lingoware.lingow.buswatch.common.beans.Route;
 import com.lingoware.lingow.buswatch.common.util.LatLng;
@@ -23,4 +23,7 @@ public interface BusWatchService {
     @WebResult(name = "routeList")
     public abstract List<Route> getRoutes(
             @WebParam(partName = "position") LatLng position, double range);
+
+    public abstract boolean addRoute(String name, LatLng latLng);
+
 }

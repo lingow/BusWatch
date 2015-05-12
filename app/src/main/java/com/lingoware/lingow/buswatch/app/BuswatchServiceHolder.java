@@ -1,6 +1,6 @@
 package com.lingoware.lingow.buswatch.app;
 
-import com.lingoware.lingow.buswatch.common.BusWatchService;
+import com.lingoware.lingow.buswatch.common.service.BusWatchService;
 import com.lingoware.lingow.buswatch.server.MockService;
 
 /**
