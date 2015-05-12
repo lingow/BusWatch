@@ -9,7 +9,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.lingoware.lingow.buswatch.R;
-import com.lingoware.lingow.buswatch.app.beans.Route;
+import com.lingoware.lingow.buswatch.common.beans.Route;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,19 +20,16 @@ import java.util.List;
 public class RouteItemAdapter extends BaseAdapter implements RouteFetcher.RouteUpdateListener, ListAdapter {
     List<Route> routes = new ArrayList<Route>();
     Context context;
-    int colors[];
 
-    public RouteItemAdapter(Context context, List<Route> routes, int colors[]) {
+    public RouteItemAdapter(Context context, List<Route> routes) {
         this.context = context;
         this.routes = routes;
-        this.colors = colors;
     }
 
     @Override
-    public void routesUpdated(List<Route> routes, int colors[]) {
+    public void routesUpdated(List<Route> routes) {
         ThreadPreconditions.checkOnMainThread();
         this.routes = routes;
-        this.colors = colors;
         this.notifyDataSetChanged();
     }
 
@@ -61,8 +58,7 @@ public class RouteItemAdapter extends BaseAdapter implements RouteFetcher.RouteU
 
         Route r = getItem(position);
         routeName.setText(r.getName());
-        if (colors != null)
-            routeName.setTextColor(colors[position]);
+        routeName.setTextColor(r.getColor());
 
         return rootView;
     }

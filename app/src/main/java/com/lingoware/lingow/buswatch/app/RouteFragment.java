@@ -1,6 +1,5 @@
 package com.lingoware.lingow.buswatch.app;
 
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
@@ -13,8 +12,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.maps.model.LatLng;
 import com.lingoware.lingow.buswatch.R;
-import com.lingoware.lingow.buswatch.app.beans.Route;
+import com.lingoware.lingow.buswatch.common.beans.Route;
 
 import org.parceler.Parcels;
 
@@ -25,7 +25,6 @@ public class RouteFragment extends Fragment {
 
 
     private static final String RUTA = "com.lingoware.lingow.buswatch.app.RouteFragment.ROUTE";
-    private static final String COLOR = "com.lingoware.lingow.buswatch.app.RouteFragment.COLOR";
 
     int ratingStarsIds[] = {
             R.id.starsRouteRating,
@@ -40,13 +39,27 @@ public class RouteFragment extends Fragment {
 
     }
 
-    public static RouteFragment newInstance(Route r, int c) {
+    public static RouteFragment newInstance(Route r) {
         RouteFragment f = new RouteFragment();
         Bundle b = new Bundle();
-        b.putParcelable(RUTA, Parcels.wrap(r));
-        b.putInt(COLOR, c);
+        b.putParcelable(RUTA, Parcels.wrap(new com.lingoware.lingow.buswatch.app.beans.Route(r)));
         f.setArguments(b);
         return f;
+    }
+
+    public static Route generateNonParcelable(com.lingoware.lingow.buswatch.app.beans.Route route) {
+        Route r =
+                new Route(
+                        route.getId(), route.getName(), route.getServiceScore(), route.getSecurityScore(), route.getUnitScore(),
+                        route.getComfortScore(), route.getOverallScore(), route.getColor());
+        int i = 0;
+        for (LatLng l : route.getRoutePoints()) {
+            r.addRoutePoint(l.latitude, l.longitude, i++);
+        }
+        for (LatLng l : route.getUnitPoints()) {
+            r.addUnitPoint(l.latitude, l.longitude);
+        }
+        return r;
     }
 
     @Nullable
@@ -54,16 +67,15 @@ public class RouteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_fragment_route, container, false);
         Route r;
-        int color = Color.BLACK;
-        color = getArguments().getInt(COLOR);
-        r = Parcels.unwrap(getArguments().getParcelable(RUTA));
+        r = generateNonParcelable(
+                (com.lingoware.lingow.buswatch.app.beans.Route) Parcels.unwrap(getArguments().getParcelable(RUTA)));
         if (r == null) {
             r = savedInstanceState.getParcelable(RUTA);
         }
         if (r != null) {
             TextView tv = ((TextView) v.findViewById(R.id.txtRouteName));
             tv.setText(r.getName());
-            tv.setTextColor(color);
+            tv.setTextColor(r.getColor());
             FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.btnCheckin);
             fab.setOnClickListener((View.OnClickListener) getActivity());
             FloatingActionButton fabCheckout = (FloatingActionButton) v.findViewById(R.id.btnCheckout);

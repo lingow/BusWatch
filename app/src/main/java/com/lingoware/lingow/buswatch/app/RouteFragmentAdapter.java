@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
-import com.lingoware.lingow.buswatch.app.beans.Route;
+import com.lingoware.lingow.buswatch.common.beans.Route;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,11 +44,11 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
         return routes.size();
     }
 
-    private boolean add(Route r, int color) {
+    private boolean add(Route r) {
         if (routes.containsKey(r.getId())) {
             return false;
         }
-        return add(r.getId(), RouteFragment.newInstance(r, color));
+        return add(r.getId(), RouteFragment.newInstance(r));
     }
 
     private boolean add(int id, RouteFragment f) {
@@ -58,10 +58,10 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
     }
 
     @Override
-    public void routesUpdated(List<Route> routes, int colors[]) {
-        allRoutesFragment.routesUpdated(routes, colors);
+    public void routesUpdated(List<Route> routes) {
+        allRoutesFragment.routesUpdated(routes);
         for (int i = 0; i < routes.size(); i++) {
-            add(routes.get(i), colors[i]);
+            add(routes.get(i));
         }
         notifyDataSetChanged();
     }
