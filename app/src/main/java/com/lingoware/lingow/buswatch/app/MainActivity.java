@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             default:
                 panel.setTouchEnabled(true);
                 cleanPolylines();
-                addPolyline(routes.get(position - 1));
+                addRouteToMap(routes.get(position - 1));
         }
     }
 
@@ -367,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void addPolylines() {
         cleanPolylines();
         for (Route r : routes) {
-            addPolyline(r);
+            addRouteToMap(r);
         }
     }
 
@@ -377,13 +377,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addPolyline(Route r) {
-        PolylineOptions po = new PolylineOptions();
-        for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : r.getRoutePoints()) {
-            po.add(new LatLng(latLng.latitude, latLng.longitude));
+    private void addRouteToMap(Route r) {
+        for (List<com.lingoware.lingow.buswatch.common.util.LatLng> latLngList : r.getRoutePaths()) {
+            PolylineOptions po = new PolylineOptions();
+            for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : latLngList) {
+                po.add(new LatLng(latLng.latitude, latLng.longitude));
+            }
+            po.color(r.getColor());
+            polylines.add(mMap.addPolyline(po));
         }
-        po.color(r.getColor());
-        polylines.add(mMap.addPolyline(po));
+
     }
 
     private void generateBuses() {

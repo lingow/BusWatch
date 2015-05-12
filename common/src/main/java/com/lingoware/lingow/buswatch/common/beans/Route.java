@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Route {
     protected int id;
     protected String name;
-    protected List<LatLng> routePoints = new ArrayList<>();
+    protected List<List<LatLng>> routePaths = new ArrayList<>();
     protected double serviceScore;
     protected double unitScore;
     protected double securityScore;
@@ -58,14 +58,6 @@ public class Route {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public List<LatLng> getRoutePoints() {
-        return routePoints;
-    }
-
-    public void setRoutePoints(List<LatLng> routePoints) {
-        this.routePoints = routePoints;
     }
 
     public List<LatLng> getUnitPoints() {
@@ -116,10 +108,6 @@ public class Route {
         this.overallScore = overallScore;
     }
 
-    public void addRoutePoint(double lat, double lon, int pos) {
-        routePoints.add(pos, new LatLng(lat, lon));
-    }
-
     public void addUnitPoint(double latitude, double longitude) {
         unitPoints.add(new LatLng(latitude, longitude));
     }
@@ -130,5 +118,17 @@ public class Route {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public List<List<LatLng>> getRoutePaths() {
+        return routePaths;
+    }
+
+    public void setRoutePaths(List<List<LatLng>> routePaths) {
+        this.routePaths = routePaths;
+    }
+
+    public void addPath(List<LatLng> path) {
+        this.routePaths.add(path);
     }
 }

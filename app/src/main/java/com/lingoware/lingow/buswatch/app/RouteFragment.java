@@ -18,6 +18,9 @@ import com.lingoware.lingow.buswatch.common.beans.Route;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by lingow on 2/05/15.
  */
@@ -53,9 +56,14 @@ public class RouteFragment extends Fragment {
                         route.getId(), route.getName(), route.getServiceScore(), route.getSecurityScore(), route.getUnitScore(),
                         route.getComfortScore(), route.getOverallScore(), route.getColor());
         int i = 0;
-        for (LatLng l : route.getRoutePoints()) {
-            r.addRoutePoint(l.latitude, l.longitude, i++);
+        for (List<LatLng> latLngList : route.getRoutePaths()) {
+            List<com.lingoware.lingow.buswatch.common.util.LatLng> path = new ArrayList<>();
+            for (LatLng l : latLngList) {
+                path.add(new com.lingoware.lingow.buswatch.common.util.LatLng(l.latitude, l.longitude));
+            }
+            r.addPath(path);
         }
+
         for (LatLng l : route.getUnitPoints()) {
             r.addUnitPoint(l.latitude, l.longitude);
         }

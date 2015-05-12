@@ -1,7 +1,7 @@
 package com.lingoware.lingow.buswatch.server;
 
-import com.lingoware.lingow.buswatch.common.service.BusWatchService;
 import com.lingoware.lingow.buswatch.common.beans.Route;
+import com.lingoware.lingow.buswatch.common.service.BusWatchService;
 import com.lingoware.lingow.buswatch.common.util.LatLng;
 
 import java.util.ArrayList;
@@ -31,9 +31,11 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {
-        for (LatLng latLng : r.getRoutePoints()) {
-            if ( range > distanceInMeters(position, latLng)) {
-                return true;
+        for (List<LatLng> latLngList : r.getRoutePaths()) {
+            for (LatLng latLng : latLngList) {
+                if (range > distanceInMeters(position, latLng)) {
+                    return true;
+                }
             }
         }
         return false;

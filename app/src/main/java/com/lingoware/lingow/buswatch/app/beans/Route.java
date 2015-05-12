@@ -18,13 +18,13 @@ public class Route {
     double serviceScore;
     String name;
     int id;
-    List<LatLng> routePoints;
+    List<List<LatLng>> routePaths;
     List<LatLng> unitPoints;
     int color;
 
 
     public Route() {
-        routePoints = new ArrayList<>();
+        routePaths = new ArrayList<>();
         unitPoints = new ArrayList<>();
     }
 
@@ -37,13 +37,21 @@ public class Route {
         this.unitScore = route.getUnitScore();
         this.securityScore = route.getSecurityScore();
         this.overallScore = route.getOverallScore();
-        for (com.lingoware.lingow.buswatch.common.util.LatLng l : route.getRoutePoints()) {
-            routePoints.add(new LatLng(l.latitude, l.longitude));
+        for (List<com.lingoware.lingow.buswatch.common.util.LatLng> latLngList : route.getRoutePaths()) {
+            List<LatLng> path = new ArrayList<>();
+            for (com.lingoware.lingow.buswatch.common.util.LatLng l : latLngList) {
+                path.add(new LatLng(l.latitude, l.longitude));
+            }
+            addPath(path);
         }
         for (com.lingoware.lingow.buswatch.common.util.LatLng l : route.getUnitPoints()) {
             unitPoints.add(new LatLng(l.latitude, l.longitude));
         }
         this.color = route.getColor();
+    }
+
+    private void addPath(List<LatLng> path) {
+        routePaths.add(path);
     }
 
     public String toString() {
@@ -107,12 +115,12 @@ public class Route {
         this.id = id;
     }
 
-    public List<LatLng> getRoutePoints() {
-        return routePoints;
+    public List<List<LatLng>> getRoutePaths() {
+        return routePaths;
     }
 
-    public void setRoutePoints(List<LatLng> routePoints) {
-        this.routePoints = routePoints;
+    public void setRoutePaths(List<List<LatLng>> routePaths) {
+        this.routePaths = routePaths;
     }
 
     public List<LatLng> getUnitPoints() {
