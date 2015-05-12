@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.lingoware.lingow.buswatch.R;
-import com.lingoware.lingow.buswatch.app.beans.Route;
+import com.lingoware.lingow.buswatch.common.beans.Route;
 
 import org.parceler.Parcels;
 
@@ -28,8 +28,6 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
     private static final String ROUTES = "com.lingoware.lingow.buswatch.app.AllRoutesFragment.ROUTES";
     RouteItemAdapter routeListadapter;
     ArrayList<Route> routes = new ArrayList<Route>();
-    private int[] colors;
-
     public AllRoutesFragment() {
         // Required empty public constructor
     }
@@ -52,16 +50,16 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
             ArrayList<Parcelable> parcelables = savedInstanceState.getParcelableArrayList(ROUTES);
             routes.clear();
             for (Parcelable p : parcelables) {
-                routes.add((Route) Parcels.unwrap(p));
+                routes.add(RouteFragment.generateNonParcelable((com.lingoware.lingow.buswatch.app.beans.Route) Parcels.unwrap(p)));
             }
         } else {
             ArrayList<Parcelable> parcelables = getArguments().getParcelableArrayList(ROUTES);
             routes.clear();
             for (Parcelable p : parcelables) {
-                routes.add((Route) Parcels.unwrap(p));
+                routes.add(RouteFragment.generateNonParcelable((com.lingoware.lingow.buswatch.app.beans.Route) Parcels.unwrap(p)));
             }
         }
-        routeListadapter = new RouteItemAdapter(this.getActivity(), routes, colors);
+        routeListadapter = new RouteItemAdapter(this.getActivity(), routes);
         listView.setAdapter(routeListadapter);
         Button btnNewRoute = new Button(getActivity());
         btnNewRoute.setText(R.string.addNewRouteButtonText);
@@ -80,11 +78,10 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
     }
 
     @Override
-    public void routesUpdated(List<Route> routes, int colors[]) {
+    public void routesUpdated(List<Route> routes) {
         if (routeListadapter != null) {
-            routeListadapter.routesUpdated(routes, colors);
+            routeListadapter.routesUpdated(routes);
         }
-        this.colors = colors;
         this.routes.clear();
         this.routes.addAll(routes);
     }
@@ -94,7 +91,7 @@ public class AllRoutesFragment extends RouteFragment implements RouteFetcher.Rou
         super.onSaveInstanceState(outState);
         ArrayList<Parcelable> parcelables = new ArrayList<Parcelable>();
         for (Route r : routes) {
-            parcelables.add(Parcels.wrap(r));
+            parcelables.add(Parcels.wrap(new com.lingoware.lingow.buswatch.app.beans.Route(r)));
         }
         outState.putParcelableArrayList(ROUTES, parcelables);
 

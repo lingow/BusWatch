@@ -2,6 +2,7 @@ package com.lingoware.lingow.buswatch.common.beans;
 
 import com.lingoware.lingow.buswatch.common.util.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,19 +12,27 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class Route {
-    int id;
-    String name;
-    List<LatLng> routePoints;
-    List<LatLng> unitPoints;
-    double serviceScore;
-    double unitScore;
-    double securityScore;
-    double comfortScore;
-    double overallScore;
+    protected int id;
+    protected String name;
+    protected List<LatLng> routePoints = new ArrayList<>();
+    protected double serviceScore;
+    protected double unitScore;
+    protected double securityScore;
+    protected double comfortScore;
+    protected double overallScore;
+    protected int color;
+    List<LatLng> unitPoints = new ArrayList<>();
 
-    public Route(int id, String name) {
+    public Route(int id, String name, double serviceScore, double securityScore, double unitScore, double comfortScore, double overallScore, int color) {
+        this();
         this.id = id;
         this.name = name;
+        this.serviceScore = serviceScore;
+        this.securityScore = securityScore;
+        this.unitScore = unitScore;
+        this.comfortScore = comfortScore;
+        this.overallScore = overallScore;
+        this.color = color;
     }
 
     public Route() {
@@ -105,5 +114,21 @@ public class Route {
 
     public void setOverallScore(double overallScore) {
         this.overallScore = overallScore;
+    }
+
+    public void addRoutePoint(double lat, double lon, int pos) {
+        routePoints.add(pos, new LatLng(lat, lon));
+    }
+
+    public void addUnitPoint(double latitude, double longitude) {
+        unitPoints.add(new LatLng(latitude, longitude));
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }

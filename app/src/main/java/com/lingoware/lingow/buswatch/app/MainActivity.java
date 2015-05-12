@@ -28,10 +28,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.lingoware.lingow.buswatch.R;
-import com.lingoware.lingow.buswatch.app.beans.Route;
+import com.lingoware.lingow.buswatch.common.beans.Route;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     LocationLoader loader;
     private MapFragment mMapFragment;
     private List<Route> routes;
-    private int[] routecolors;
+    private List<Polyline> polylines = new ArrayList<>();
 
     boolean mapset() {
         return marker != null;
@@ -286,9 +289,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private BitmapDescriptor coloredBusIcon(int i) {
+    private BitmapDescriptor coloredBusIcon(Route r) {
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_bus);
-        Paint p = new Paint(routecolors[i]);
+        Paint p = new Paint(r.getColor());
         return null;
     }
 
@@ -298,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.routelist_view:
                 if (routePager != null) {
                     routePager.setCurrentItem(position + 1);
-                    /*TODO Set this routes's poliline in the map */
                 }
                 break;
             default:
@@ -318,9 +320,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case 0:
                 panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 panel.setTouchEnabled(false);
+                addPolylines();
                 break;
             default:
                 panel.setTouchEnabled(true);
+                cleanPolylines();
+                addPolyline(routes.get(position - 1));
         }
     }
 
@@ -342,20 +347,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMarkerDragEnd(Marker marker) {
         LatLng p = marker.getPosition();
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(p));
         location.setLatitude(p.latitude);
         location.setLongitude(p.longitude);
         reloadSlidingPanel(p);
     }
 
     @Override
-    public void routesUpdated(List<Route> routes, int colors[]) {
+    public void routesUpdated(List<Route> routes) {
         this.routes = routes;
-        routecolors = colors;
         generateBuses();
-        //TODO Falta agregar la informacion de las rutas al mapa, junto con los camioncitos
+        addPolylines();
+        addBuses();
+    }
+
+    private void addBuses() {
+    }
+
+    private void addPolylines() {
+        cleanPolylines();
+        for (Route r : routes) {
+            addPolyline(r);
+        }
+    }
+
+    private void cleanPolylines() {
+        for (Polyline p : polylines) {
+            p.remove();
+        }
+    }
+
+    private void addPolyline(Route r) {
+        PolylineOptions po = new PolylineOptions();
+        for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : r.getRoutePoints()) {
+            po.add(new LatLng(latLng.latitude, latLng.longitude));
+        }
+        po.color(r.getColor());
+        polylines.add(mMap.addPolyline(po));
     }
 
     private void generateBuses() {
         //TODO Falta generar iconos de autobuses de distintos colores para cada ruta
     }
+
 }
