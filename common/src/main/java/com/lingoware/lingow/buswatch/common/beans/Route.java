@@ -21,7 +21,6 @@ public class Route {
     protected double comfortScore;
     protected double overallScore;
     protected int color;
-    List<LatLng> unitPoints = new ArrayList<>();
 
     public Route(int id, String name, double serviceScore, double securityScore, double unitScore, double comfortScore, double overallScore, int color) {
         this();
@@ -58,14 +57,6 @@ public class Route {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public List<LatLng> getUnitPoints() {
-        return unitPoints;
-    }
-
-    public void setUnitPoints(List<LatLng> unitPoints) {
-        this.unitPoints = unitPoints;
     }
 
     public double getServiceScore() {
@@ -106,10 +97,6 @@ public class Route {
 
     public void setOverallScore(double overallScore) {
         this.overallScore = overallScore;
-    }
-
-    public void addUnitPoint(double latitude, double longitude) {
-        unitPoints.add(new LatLng(latitude, longitude));
     }
 
     public int getColor() {

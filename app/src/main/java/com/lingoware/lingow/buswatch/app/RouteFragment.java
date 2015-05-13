@@ -65,9 +65,6 @@ public class RouteFragment extends Fragment {
             r.addPath(path);
         }
 
-        for (LatLng l : route.getUnitPoints()) {
-            r.addUnitPoint(l.latitude, l.longitude);
-        }
         return r;
     }
 
@@ -103,7 +100,8 @@ public class RouteFragment extends Fragment {
             LayerDrawable stars = (LayerDrawable) r.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.starFullySelected), PorterDuff.Mode.SRC_ATOP);
             stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.starPartiallySelected), PorterDuff.Mode.SRC_ATOP);
-            stars.getDrawable(0).setColorFilter(getResources().getColor(R.color.starNotSelected), PorterDuff.Mode.SRC_ATOP);
+            if (rid != ratingStarsIds[0])
+                stars.getDrawable(0).setColorFilter(getResources().getColor(R.color.starNotSelected), PorterDuff.Mode.SRC_ATOP);
             setRating(r, rid, route);
         }
     }

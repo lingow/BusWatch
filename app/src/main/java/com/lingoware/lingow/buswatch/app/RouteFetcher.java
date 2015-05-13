@@ -14,9 +14,11 @@ import java.util.List;
 public class RouteFetcher extends AsyncTask<LatLng, Integer, List<Route>> {
 
     private RouteUpdateListener listeners[];
+    private double range;
 
-    public RouteFetcher(RouteUpdateListener... listeners) {
+    public RouteFetcher(double range, RouteUpdateListener... listeners) {
         this.listeners = listeners;
+        this.range = range;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class RouteFetcher extends AsyncTask<LatLng, Integer, List<Route>> {
             routes.addAll(
                     BuswatchServiceHolder.getInstance().getService().getRoutes(
                             new com.lingoware.lingow.buswatch.common.util.LatLng(
-                                    l.latitude, l.longitude), 100));
+                                    l.latitude, l.longitude), range));
         }
         int colors[] = ColorGenerator.generateColors(routes.size());
         for (int i = 0; i < colors.length; i++) {
