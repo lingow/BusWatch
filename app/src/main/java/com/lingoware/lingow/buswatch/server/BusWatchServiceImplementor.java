@@ -158,11 +158,6 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     @Override
-    public List<LatLng> getUnitPoints(int routeId) {
-        return null;
-    }
-
-    @Override
     public boolean rateRoute(int routeId, double comfort, double security, double service, double unit,
                              double overall) {
         Route route = rutas.get(routeId);
