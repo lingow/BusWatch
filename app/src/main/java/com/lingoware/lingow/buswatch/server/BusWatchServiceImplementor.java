@@ -12,6 +12,9 @@ import java.util.Map;
 public class BusWatchServiceImplementor implements BusWatchService {
     private final double EARTH_RADIUS_KILOMETERS = 6367.45;
     protected Map<Integer, Route> rutas = new HashMap<>();
+    protected ArrayList<Integer> checkins = new ArrayList<>();
+    protected int checkinId = 0;
+    protected int routeId = 0;
 
     @Override
     public List<Route> getRoutes(LatLng position, double range) {
@@ -26,8 +29,20 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     @Override
-    public boolean addRoute(String name, LatLng latLng) {
-        return false;
+    public boolean addRoute(String name, LatLng startingPoint) {
+        Route route = new Route();
+        List<LatLng> routePoints = new ArrayList<>();
+        routePoints.add(startingPoint);
+        route.setName(name);
+        route.setId(routeId);
+        route.setComfortScore(0);
+        route.setSecurityScore(0);
+        route.setServiceScore(0);
+        route.setUnitScore(0);
+        route.setOverallScore(0);
+        rutas.put(routeId, route);
+        routeId++;
+        return true;
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {
@@ -90,4 +105,48 @@ public class BusWatchServiceImplementor implements BusWatchService {
 
         return new Float(distance * meterConversion).floatValue();
     }
+
+    @Override
+    public int checkin(int routeId, LatLng latlng) {
+        checkinId++;
+        checkins.add(checkinId);
+        return checkinId;
+    }
+
+    @Override
+    public boolean checkout(int checkinId) {
+        checkins.remove(checkinId);
+        return true;
+    }
+
+    @Override
+    public boolean rateRoute(int routeId, double comfort, double security, double service, double unit,
+                             double overall) {
+        Route route = rutas.get(routeId);
+        route.setComfortScore(comfort);
+        route.setSecurityScore(security);
+        route.setServiceScore(service);
+        route.setUnitScore(unit);
+        route.setOverallScore(overall);
+        return true;
+    }
+
+    @Override
+    public HashMap<String,Double> calculateScores(Route routeId)  {
+        Route route = rutas.get(routeId);
+        HashMap<String, Double> scores = new HashMap<String, Double>();
+        double comfort = route.getComfortScore();
+        double overall = route.getOverallScore();
+        double security = route.getSecurityScore();
+        double service = route.getServiceScore();
+        double unit = route.getUnitScore();
+        scores.put("comfort", comfort);
+        scores.put("security", security);
+        scores.put("service", service);
+        scores.put("unit", unit);
+        scores.put("overall", overall);
+        return scores;
+    }
+
+
 }
