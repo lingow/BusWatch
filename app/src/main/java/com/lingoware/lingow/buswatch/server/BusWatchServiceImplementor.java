@@ -34,17 +34,17 @@ public class BusWatchServiceImplementor implements BusWatchService {
 
     @Override
     public boolean addRoute(String name, LatLng startingPoint) {
-        Route route = new Route();
+        Route route = new Route(0, name, 0, 0, 0, 0, 0, 0);
         List<LatLng> routePoints = new ArrayList<>();
         routePoints.add(startingPoint);
-        route.setName(name);
-        route.setId(routeId);
-        route.setComfortScore(0);
-        route.setSecurityScore(0);
-        route.setServiceScore(0);
-        route.setUnitScore(0);
-        route.setOverallScore(0);
-        rutas.put(routeId, route);
+        route.addPath(routePoints);
+        return addRoute(route);
+    }
+
+
+    public boolean addRoute(Route r) {
+        r.setId(routeId);
+        rutas.put(routeId, r);
         routeId++;
         return true;
     }
@@ -143,7 +143,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
         checkinId++;
         checkins.add(checkinId);
         routeSession.put(checkinId, routeId);
-        activeRoutes.put(routeId,checkinId);
+        activeRoutes.put(routeId, checkinId);
         List<LatLng> checkinLocation = new ArrayList<>();
         checkinLocation.add(latlng);
         updates.put(checkinId, checkinLocation);
