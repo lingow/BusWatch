@@ -5,6 +5,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,20 +92,47 @@ public class RouteFragment extends Fragment {
             fabCheckout.setEnabled(false);
             fabCheckout.setVisibility(View.INVISIBLE);
 
-            //TODO todavia falta llenar las estrellas con la informacion correspondiente
-            setupRatingBars(v);
+            setupRatingBars(v, r);
         }
         return v;
     }
 
-    private void setupRatingBars(View v) {
+    private void setupRatingBars(View v, Route route) {
         for (int rid : ratingStarsIds) {
             RatingBar r = (RatingBar) v.findViewById(rid);
             LayerDrawable stars = (LayerDrawable) r.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.starFullySelected), PorterDuff.Mode.SRC_ATOP);
             stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.starPartiallySelected), PorterDuff.Mode.SRC_ATOP);
             stars.getDrawable(0).setColorFilter(getResources().getColor(R.color.starNotSelected), PorterDuff.Mode.SRC_ATOP);
-            r.setIsIndicator(true);
+            setRating(r, rid, route);
+        }
+    }
+
+    private void setRating(RatingBar r, int rid, Route route) {
+        r.setIsIndicator(true);
+        r.setMax(5);
+        switch (rid) {
+            case R.id.starsRouteRating:
+                r.setRating((float) route.getOverallScore());
+                break;
+            case R.id.comfortStars:
+                r.setRating((float) route.getComfortScore());
+                break;
+            case R.id.conditionStars:
+                r.setRating((float) route.getUnitScore());
+                break;
+            case R.id.serviceStars:
+                r.setRating((float) route.getServiceScore());
+                break;
+            case R.id.overallStars:
+                r.setRating((float) route.getOverallScore());
+                break;
+            case R.id.SecurityStars:
+                r.setRating((float) route.getSecurityScore());
+                break;
+            default:
+                Log.wtf("WTF", "Not an invalid star rating ID was passed to this method. " +
+                        "Exiting without doing anything");
         }
     }
 
