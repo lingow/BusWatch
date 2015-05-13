@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_location_updates_entries">
+        <item>3 seconds</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>25 seconds</item>
+        <item>30 seconds</item>
+        <item>45 seconds</item>
+        <item>60 seconds</item>
+    </string-array>
+    <string-array name="pref_location_updates_values">
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>25</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="pref_route_seek_range_entries">
+        <item>100 meters</item>
+        <item>200 meters</item>
+        <item>300 meters</item>
+        <item>500 meters</item>
+        <item>1 km</item>
+        <item>1.5 km</item>
+        <item>2 km</item>
+    </string-array>
+    <string-array name="pref_route_seek_range_values">
+        <item>100</item>
+        <item>200</item>
+        <item>300</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+    </string-array>
+</resources>

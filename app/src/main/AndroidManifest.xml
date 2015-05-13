@@ -40,15 +40,16 @@
             android:name=".app.MainActivity"
             android:label="@string/title_activity_main" />
         <activity
-            android:name=".app.SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity
             android:name=".app.NewRouteActivity"
             android:label="@string/title_activity_new_route"
             android:parentActivityName=".app.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".app.MainActivity" />
+        </activity>
+        <activity
+            android:name=".app.SettingsActivity"
+            android:label="@string/title_activity_settings">
         </activity>
     </application>
 

@@ -12,6 +12,6 @@
 
     <header
         android:fragment="com.lingoware.lingow.buswatch.app.SettingsActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
+        android:title="@string/pref_header_settings" />
 
 </preference-headers>

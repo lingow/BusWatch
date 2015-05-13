@@ -1,15 +1,18 @@
 package com.lingoware.lingow.buswatch.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,7 +42,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         View.OnClickListener, AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener,
-        GoogleMap.OnMarkerDragListener, RouteFetcher.RouteUpdateListener {
+        GoogleMap.OnMarkerDragListener, RouteFetcher.RouteUpdateListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     public static final String LOCATION = "com.lingoware.lingow.buswatch.app.MainActivity.LOCATION";
@@ -57,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapFragment mMapFragment;
     private List<Route> routes;
     private List<Polyline> polylines = new ArrayList<>();
+    private int checkinFrequency;
+    private int syncFrequency;
+    private int routeSeekRange;
 
     boolean mapset() {
         return marker != null;
@@ -74,8 +81,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loadSettings();
         loader = new LocationLoader(this);
         loadCurrentLocation(savedInstanceState);
+    }
+
+    private void loadSettings() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        onSharedPreferenceChanged(sp, getResources().getString(R.string.pref_checkin_frequency));
+        onSharedPreferenceChanged(sp, getResources().getString(R.string.pref_sync_frequency));
+        onSharedPreferenceChanged(sp, getResources().getString(R.string.pref_route_seek_range));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //TODO RestoreInstanceState
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //TODO Save Instance State
     }
 
     private void loadCurrentLocation(Bundle savedInstanceState) {
@@ -122,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void reloadSlidingPanel(LatLng pos) {
-        RouteFetcher routeFetcher = new RouteFetcher(routeFragmentAdapter, this);
+        RouteFetcher routeFetcher = new RouteFetcher(routeSeekRange, routeFragmentAdapter, this);
         routeFetcher.execute(pos);
     }
 
@@ -191,13 +218,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        /* TODO: Descomentar esto si es que tendremos Settings
-
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_activity_main, menu);
-
-        */
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -206,7 +229,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -393,4 +417,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //TODO Falta generar iconos de autobuses de distintos colores para cada ruta
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if (key.equals(getResources().getString(R.string.pref_checkin_frequency))) {
+            this.checkinFrequency = Integer.parseInt(sharedPreferences.getString(key,
+                    getResources().getString(R.string.pref_checkin_frequency_default)));
+        } else if (key.equals(getResources().getString(R.string.pref_sync_frequency))) {
+            this.syncFrequency = Integer.parseInt(sharedPreferences.getString(key,
+                    getResources().getString(R.string.pref_sync_frequency_default)));
+        } else if (key.equals(getResources().getString(R.string.pref_route_seek_range))) {
+            this.routeSeekRange = Integer.parseInt(sharedPreferences.getString(key,
+                    getResources().getString(R.string.pref_route_seek_range_default)));
+        }
+    }
 }
