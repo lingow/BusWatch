@@ -8,6 +8,9 @@ import com.lingoware.lingow.buswatch.server.MockService;
  */
 public class BuswatchServiceHolder {
 
+    //TODO set this to be something meaningfull
+    private static final String WSDLURL = "";
+
     static BuswatchServiceHolder buswatchServiceHolder;
     BusWatchService service;
 
@@ -29,16 +32,25 @@ public class BuswatchServiceHolder {
     }
 
     private void initService() {
-        //TODO Aqui es donde hay que crear la conexion al servicio. Por el momento solo usaremos MockService
         this.service = new MockService();
-        /*this.service = new BusWatchService() {
-            @Override
-            public List<Route> getRoutes(LatLng position, double range) {
-                List<Route> l= new ArrayList<>();
-                l.add( new Route(1,"Test",5,5,5,5,5));
-                return l;
-            }
-        };*/
+
+        /*TODO uncomment when the service is ready
+
+        URL url = null;
+
+        try {
+            url = new URL(WSDLURL);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Log.wtf("SERVICE", "The WSDLURL is all wrong");
+        }
+        QName qname = new QName("http://service.common.buswatch.lingow.lingoware.com/","BusWatchService");
+		Service service = Service.create(url, qname);
+
+		this.service = service.getPort(BusWatchService.class);
+
+		*/
+
     }
 
 }
