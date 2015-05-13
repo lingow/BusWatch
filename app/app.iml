@@ -92,8 +92,8 @@
     <orderEntry type="library" exported="" name="jsr181-api-1.0-MR1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="jaxws-api-2.2.11" level="project" />
-    <orderEntry type="library" exported="" name="library-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="javax.xml.soap-api-1.3.5" level="project" />
+    <orderEntry type="library" exported="" name="library-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="parceler-0.2.16" level="project" />
     <orderEntry type="library" exported="" name="javax.annotation-api-1.2-b03" level="project" />

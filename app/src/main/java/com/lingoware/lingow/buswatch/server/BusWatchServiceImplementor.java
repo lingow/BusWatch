@@ -132,7 +132,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     @Override
-    public HashMap<String,Double> calculateScores(Route routeId)  {
+    public HashMap<String,Double> calculateScores(int routeId)  {
         Route route = rutas.get(routeId);
         HashMap<String, Double> scores = new HashMap<String, Double>();
         double comfort = route.getComfortScore();
