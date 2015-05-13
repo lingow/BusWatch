@@ -154,6 +154,8 @@ public class BusWatchServiceImplementor implements BusWatchService {
     @Override
     public boolean checkout(int checkinId) {
         checkins.remove(checkinId);
+        routeSession.remove(checkinId);
+        activeRoutes.remove(checkinId);
         return true;
     }
 
