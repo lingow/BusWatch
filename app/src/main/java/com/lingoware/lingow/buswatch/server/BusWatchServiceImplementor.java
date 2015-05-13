@@ -13,6 +13,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
     private final double EARTH_RADIUS_KILOMETERS = 6367.45;
     protected Map<Integer, Route> rutas = new HashMap<>();
     protected ArrayList<Integer> checkins = new ArrayList<>();
+    protected HashMap<Integer, LatLng> unitPoints = new HashMap<>();
     protected int checkinId = 0;
     protected int routeId = 0;
 
@@ -43,6 +44,18 @@ public class BusWatchServiceImplementor implements BusWatchService {
         rutas.put(routeId, route);
         routeId++;
         return true;
+    }
+
+    public List<LatLng> getUnitPoints(int routeId) {
+        List<LatLng> up = new ArrayList<>();
+
+        for (Map.Entry<Integer,LatLng> unitPoint : unitPoints.entrySet()) {
+            if(unitPoint.getKey() == routeId) {
+                up.add(unitPoint.getValue());
+            }
+        }
+
+        return up;
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {
@@ -139,7 +152,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
     @Override
     public HashMap<String,Double> calculateScores(int routeId)  {
         Route route = rutas.get(routeId);
-        HashMap<String, Double> scores = new HashMap<String, Double>();
+        HashMap<String, Double> scores = new HashMap<>();
         double comfort = route.getComfortScore();
         double overall = route.getOverallScore();
         double security = route.getSecurityScore();
