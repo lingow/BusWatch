@@ -476,4 +476,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     void stopRepeatingTask() {
         mHandler.removeCallbacks(mStatusChecker);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopRepeatingTask();
+        loader.stopUpdates();
+    }
 }
