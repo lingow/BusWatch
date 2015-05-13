@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 public class NonSwipeableViewPager extends ViewPager {
 
     private boolean enabled;
+    private int defaultRoute;
 
     public NonSwipeableViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);

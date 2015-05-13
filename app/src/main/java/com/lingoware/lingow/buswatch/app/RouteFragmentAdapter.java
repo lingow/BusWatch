@@ -23,6 +23,8 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
     AllRoutesFragment allRoutesFragment;
 
     SparseArray<RouteFragment> registeredFragments = new SparseArray<RouteFragment>();
+    private List<DataSetChangesListener> dataSetChangesListeners = new ArrayList<>();
+
 
     public RouteFragmentAdapter(FragmentManager fm) {
         super(fm);
@@ -32,6 +34,10 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
 
     private static String makeFragmentName(int viewId, int index) {
         return "android:switcher:" + viewId + ":" + index;
+    }
+
+    public void addDataSetChangesListener(DataSetChangesListener d) {
+        dataSetChangesListeners.add(d);
     }
 
     @Override
@@ -86,5 +92,17 @@ public class RouteFragmentAdapter extends FragmentStatePagerAdapter implements R
 
     public RouteFragment getRegisteredFragment(int position) {
         return registeredFragments.get(position);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        for (DataSetChangesListener d : dataSetChangesListeners) {
+            d.onDataSetChanged();
+        }
+    }
+
+    public interface DataSetChangesListener {
+        public abstract void onDataSetChanged();
     }
 }

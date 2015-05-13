@@ -8,11 +8,10 @@ import com.lingoware.lingow.buswatch.server.MockService;
  */
 public class BuswatchServiceHolder {
 
+    static final BusWatchService service = new MockService();
     //TODO set this to be something meaningfull
     private static final String WSDLURL = "";
-
     static BuswatchServiceHolder buswatchServiceHolder;
-    BusWatchService service;
 
     private BuswatchServiceHolder() {
     }
@@ -32,8 +31,6 @@ public class BuswatchServiceHolder {
     }
 
     private void initService() {
-        this.service = new MockService();
-
         /*TODO uncomment when the service is ready
 
         URL url = null;

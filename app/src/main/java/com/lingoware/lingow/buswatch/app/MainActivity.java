@@ -17,9 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,15 +42,18 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         View.OnClickListener, AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener,
         GoogleMap.OnMarkerDragListener, RouteFetcher.RouteUpdateListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener, RouteFragmentAdapter.DataSetChangesListener {
 
 
     public static final String LOCATION = "com.lingoware.lingow.buswatch.app.MainActivity.LOCATION";
+    private static final String CHECKINID = "com.lingoware.lingow.buswatch.app.MainActivity.CHECKINID";
+    private static final String SELECTEDROUTE = "com.lingoware.lingow.buswatch.app.MainActivity.SELECTEDROUTE";
+
     GoogleMap mMap;
     SlidingUpPanelLayout panel;
     Location location;
     NonSwipeableViewPager routePager;
-    boolean duringcheckin = false;
+    int checkedInId = -1;
     Marker marker;
     RouteFragment currentRouteFragment;
     BitmapDescriptor[] buses;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mHandler.postDelayed(mStatusChecker, syncFrequency);
         }
     };
+    private int selectedRouteid = 0;
 
     boolean mapset() {
         return marker != null;
@@ -107,13 +109,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //TODO RestoreInstanceState
+        selectedRouteid = savedInstanceState.getInt(SELECTEDROUTE, -1);
+        checkedInId = savedInstanceState.getInt(CHECKINID, -1);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //TODO Save Instance State
+        outState.putInt(CHECKINID, checkedInId);
+        outState.putInt(SELECTEDROUTE, selectedRouteid);
+
     }
 
     private void loadCurrentLocation(Bundle savedInstanceState) {
@@ -156,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         routePager = ((NonSwipeableViewPager) findViewById(R.id.route_scroller));
         routePager.setAdapter(routeFragmentAdapter);
         routePager.setOnPageChangeListener(this);
+        routeFragmentAdapter.addDataSetChangesListener(this);
         reloadSlidingPanel(new LatLng(location.getLatitude(), location.getLongitude()));
     }
 
@@ -250,33 +256,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onClick(View v) {
-        FloatingActionButton fabCheckout;
-        FloatingActionButton fabCheckin;
-
         switch (v.getId()) {
             case R.id.btnAddRoute:
                 Intent i = new Intent(this, NewRouteActivity.class);
                 startActivity(i);
                 break;
             case R.id.btnCheckin:
-                fabCheckin = (FloatingActionButton) v;
-                panel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-                routePager.setPagingEnabled(false);
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtCheckIn))
-                        .setText("CheckOut");
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewTitle))
-                        .setText("Please Rate the Route");
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewMessage))
-                        .setText("Review will be sent upon checkout");
-                fabCheckin.setEnabled(false);
-                fabCheckin.setVisibility(View.INVISIBLE);
-                fabCheckin.invalidate();
-
-                fabCheckout = ((FloatingActionButton) currentRouteFragment.getView()
-                        .findViewById(R.id.btnCheckout));
-                fabCheckout.setEnabled(true);
-                fabCheckout.setVisibility(View.VISIBLE);
-                fabCheckout.invalidate();
+                setCheckedInMode();
 
                 loader.startUpdates(new LocationListener() {
                     @Override
@@ -284,42 +270,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         MainActivity.this.location = location;
                         MainActivity.this.marker.setPosition(
                                 new LatLng(location.getLatitude(), location.getLongitude()));
+                        //TODO Aqui hay qué hacer el update de el checkin
                     }
                 });
 
-                currentRouteFragment.setModificableRatingBars(currentRouteFragment.getView(), true);
-
-                duringcheckin = true;
-
+                checkedInId = BuswatchServiceHolder.getInstance().getService().
+                        checkin(currentRouteFragment.route.getId(),
+                                new com.lingoware.lingow.buswatch.common.util.LatLng(
+                                        marker.getPosition().latitude, marker.getPosition().longitude));
                 break;
             case R.id.btnCheckout:
-                fabCheckout = (FloatingActionButton) v;
-                panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                routePager.setPagingEnabled(true);
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtCheckIn))
-                        .setText("CheckIn");
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewTitle))
-                        .setText("Route's Rating");
-                ((TextView) currentRouteFragment.getView().findViewById(R.id.txtReviewMessage))
-                        .setText("");
-                fabCheckout.setEnabled(false);
-                fabCheckout.setVisibility(View.INVISIBLE);
-                fabCheckout.invalidate();
-
-                fabCheckin = ((FloatingActionButton) currentRouteFragment.getView()
-                        .findViewById(R.id.btnCheckin));
-                fabCheckin.setEnabled(true);
-                fabCheckin.setVisibility(View.VISIBLE);
-                fabCheckin.invalidate();
-                currentRouteFragment.setModificableRatingBars(currentRouteFragment.getView(), false);
+                setCheckedOutMode();
 
                 loader.stopUpdates();
 
-                marker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                duringcheckin = false;
-
+                BuswatchServiceHolder.getInstance().getService().checkout(checkedInId);
+                checkedInId = -1;
             default:
         }
+    }
+
+    private void setCheckedOutMode() {
+        panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        routePager.setPagingEnabled(true);
+
+        currentRouteFragment.setCheckedOutMode();
+    }
+
+    private void setCheckedInMode() {
+        panel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        routePager.setPagingEnabled(false);
+        currentRouteFragment.setCheckedInMode();
     }
 
     private BitmapDescriptor coloredBusIcon(Route r) {
@@ -369,7 +350,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             default:
                 panel.setTouchEnabled(true);
                 cleanPolylines();
-                addRouteToMap(routes.get(position - 1));
+                addRouteToMap(currentRouteFragment.route);
+                if (checkedInId != -1) {
+                    setCheckedInMode();
+                }
         }
     }
 
@@ -428,7 +412,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 po.add(new LatLng(latLng.latitude, latLng.longitude));
             }
             po.color(r.getColor());
-            polylines.add(mMap.addPolyline(po));
+            if (mMap != null) {
+                polylines.add(mMap.addPolyline(po));
+            } else {
+
+            }
         }
 
     }
@@ -481,6 +469,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
         stopRepeatingTask();
-        loader.stopUpdates();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (loader.updatesStarted) {
+            loader.stopUpdates();
+        }
+    }
+
+    @Override
+    public void onDataSetChanged() {
+        for (int i = 0; i < routeFragmentAdapter.getCount(); i++) {
+            if (selectedRouteid == routeFragmentAdapter.getItem(i).getId()) {
+                routePager.setCurrentItem(i + 1);
+                return;
+            }
+        }
+        routePager.setCurrentItem(0);
     }
 }

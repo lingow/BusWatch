@@ -24,7 +24,7 @@ public class LocationLoader implements GoogleApiClient.ConnectionCallbacks, Goog
     boolean singleUpdate = false;
 
     LocationRequest mLocationRequest;
-    private boolean updatesStarted;
+    boolean updatesStarted;
 
     public LocationLoader(Activity context) {
         this.context = context;
@@ -106,14 +106,16 @@ public class LocationLoader implements GoogleApiClient.ConnectionCallbacks, Goog
     }
 
     public void stopUpdates() {
-        for (LocationListener l : locationListeners) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(
-                    mGoogleApiClient, l);
-        }
-        locationListeners = null;
-        if (updatesStarted) {
-            disconnect();
-            updatesStarted = false;
+        if (locationListeners != null) {
+            for (LocationListener l : locationListeners) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(
+                        mGoogleApiClient, l);
+            }
+            locationListeners = null;
+            if (updatesStarted) {
+                disconnect();
+                updatesStarted = false;
+            }
         }
 
     }
