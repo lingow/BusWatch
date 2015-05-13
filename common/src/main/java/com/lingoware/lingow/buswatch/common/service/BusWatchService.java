@@ -47,4 +47,11 @@ public interface BusWatchService {
     @WebResult(name = "unitPoints")
     public abstract List<LatLng> getUnitPoints(int routeId);
 
+    @WebMethod(action = "receiveUpdate", operationName = "receiveUpdate")
+    public abstract boolean receiveUpdate(int checkinId, List<LatLng> latlng);
+
+    @WebMethod(action = "getActiveCheckins", operationName = "getActiveCheckins")
+    @WebResult(name = "activeRoutes")
+    public abstract List<Integer> getActiveRoutes(int routeId);
+
 }

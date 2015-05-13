@@ -14,6 +14,9 @@ public class BusWatchServiceImplementor implements BusWatchService {
     protected Map<Integer, Route> rutas = new HashMap<>();
     protected ArrayList<Integer> checkins = new ArrayList<>();
     protected HashMap<Integer, LatLng> unitPoints = new HashMap<>();
+    protected HashMap<Integer, Integer> routeSession = new HashMap<>();
+    protected HashMap<Integer, List<LatLng>> updates = new HashMap<>(); // This can be renamed to checkinLocation
+    protected HashMap<Integer, Integer> activeRoutes = new HashMap<>();
     protected int checkinId = 0;
     protected int routeId = 0;
 
@@ -46,16 +49,32 @@ public class BusWatchServiceImplementor implements BusWatchService {
         return true;
     }
 
+    @Override
     public List<LatLng> getUnitPoints(int routeId) {
         List<LatLng> up = new ArrayList<>();
-
         for (Map.Entry<Integer,LatLng> unitPoint : unitPoints.entrySet()) {
             if(unitPoint.getKey() == routeId) {
                 up.add(unitPoint.getValue());
             }
         }
-
         return up;
+    }
+
+    @Override
+    public boolean receiveUpdate(int checkinId, List<LatLng> latlng) {
+        updates.put(checkinId, latlng);
+        return true;
+    }
+
+    @Override
+    public List<Integer> getActiveRoutes(int routeId){
+        List<Integer> checkinList = new ArrayList<>();
+        for (Map.Entry<Integer,Integer> route : activeRoutes.entrySet()) {
+            if(route.getKey() == routeId) {
+                checkinList.add(routeId);
+            }
+        }
+        return checkinList;
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {
@@ -123,6 +142,12 @@ public class BusWatchServiceImplementor implements BusWatchService {
     public int checkin(int routeId, LatLng latlng) {
         checkinId++;
         checkins.add(checkinId);
+        routeSession.put(checkinId, routeId);
+        activeRoutes.put(routeId,checkinId);
+        List<LatLng> checkinLocation = new ArrayList<>();
+        checkinLocation.add(latlng);
+        updates.put(checkinId, checkinLocation);
+
         return checkinId;
     }
 
