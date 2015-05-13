@@ -26,8 +26,10 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     @Override
-    public boolean addRoute(String name, LatLng latLng) {
-        return false;
+    public List<LatLng> getUnitPoints(int routeId) {
+        List<LatLng> ret = new ArrayList<>();
+        //TODO Fill ret with the LatLng of the units which are being tracked at the moment
+        return ret;
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {

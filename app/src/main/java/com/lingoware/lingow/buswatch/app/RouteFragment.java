@@ -65,9 +65,6 @@ public class RouteFragment extends Fragment {
             r.addPath(path);
         }
 
-        for (LatLng l : route.getUnitPoints()) {
-            r.addUnitPoint(l.latitude, l.longitude);
-        }
         return r;
     }
 

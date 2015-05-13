@@ -19,13 +19,11 @@ public class Route {
     String name;
     int id;
     List<List<LatLng>> routePaths;
-    List<LatLng> unitPoints;
     int color;
 
 
     public Route() {
         routePaths = new ArrayList<>();
-        unitPoints = new ArrayList<>();
     }
 
     public Route(com.lingoware.lingow.buswatch.common.beans.Route route) {
@@ -44,9 +42,7 @@ public class Route {
             }
             addPath(path);
         }
-        for (com.lingoware.lingow.buswatch.common.util.LatLng l : route.getUnitPoints()) {
-            unitPoints.add(new LatLng(l.latitude, l.longitude));
-        }
+
         this.color = route.getColor();
     }
 
@@ -121,14 +117,6 @@ public class Route {
 
     public void setRoutePaths(List<List<LatLng>> routePaths) {
         this.routePaths = routePaths;
-    }
-
-    public List<LatLng> getUnitPoints() {
-        return unitPoints;
-    }
-
-    public void setUnitPoints(List<LatLng> unitPoints) {
-        this.unitPoints = unitPoints;
     }
 
     public int getColor() {

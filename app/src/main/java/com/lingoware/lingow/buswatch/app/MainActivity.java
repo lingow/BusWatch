@@ -4,9 +4,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Paint;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -58,12 +59,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     int selectedRoutePage;
     RouteFragmentAdapter routeFragmentAdapter;
     LocationLoader loader;
+    List<Marker> busMarkers = new ArrayList<>();
     private MapFragment mMapFragment;
     private List<Route> routes;
     private List<Polyline> polylines = new ArrayList<>();
     private int checkinFrequency;
     private int syncFrequency;
     private int routeSeekRange;
+    private Handler mHandler;
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            updateUnitPositions();
+            mHandler.postDelayed(mStatusChecker, syncFrequency);
+        }
+    };
 
     boolean mapset() {
         return marker != null;
@@ -84,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         loadSettings();
         loader = new LocationLoader(this);
         loadCurrentLocation(savedInstanceState);
+        mHandler = new Handler();
     }
 
     private void loadSettings() {
@@ -278,8 +289,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 currentRouteFragment.setModificableRatingBars(currentRouteFragment.getView(), true);
 
-                //TODO use colored bus markers
-
                 duringcheckin = true;
 
                 break;
@@ -315,8 +324,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private BitmapDescriptor coloredBusIcon(Route r) {
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_bus);
-        Paint p = new Paint(r.getColor());
-        return null;
+        int[] pixels = new int[b.getHeight() * b.getWidth()];
+
+        b.getPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+
+        for (int i = 0; i < b.getHeight() * b.getWidth(); i++) {
+
+            if (pixels[i] == Color.BLACK)
+                pixels[i] = r.getColor();
+        }
+
+        b.setPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+
+        return BitmapDescriptorFactory.fromBitmap(b);
     }
 
     @Override
@@ -430,5 +450,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             this.routeSeekRange = Integer.parseInt(sharedPreferences.getString(key,
                     getResources().getString(R.string.pref_route_seek_range_default)));
         }
+    }
+
+    private void updateUnitPositions() {
+        for (Marker m : busMarkers) {
+            m.remove();
+        }
+        for (Route r : routes) {
+            List<com.lingoware.lingow.buswatch.common.util.LatLng> routePoints =
+                    BuswatchServiceHolder.getInstance().getService().getUnitPoints(r.getId());
+            for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : routePoints) {
+                busMarkers.add(mMap.addMarker(
+                        new MarkerOptions()
+                                .icon(coloredBusIcon(r))
+                                .position(new LatLng(latLng.latitude, latLng.longitude))));
+            }
+        }
+
+    }
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
     }
 }

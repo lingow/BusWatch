@@ -24,6 +24,7 @@ public interface BusWatchService {
     public abstract List<Route> getRoutes(
             @WebParam(partName = "position") LatLng position, double range);
 
-    public abstract boolean addRoute(String name, LatLng latLng);
-
+    @WebMethod(action = "getUnitPoints", operationName = "getUnitPoints")
+    @WebResult(name = "unitPoints")
+    public abstract List<LatLng> getUnitPoints(int routeId);
 }
