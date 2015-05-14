@@ -12,11 +12,8 @@ import java.util.Map;
 public class BusWatchServiceImplementor implements BusWatchService {
     private final double EARTH_RADIUS_KILOMETERS = 6367.45;
     protected Map<Integer, Route> rutas = new HashMap<>();
-    protected ArrayList<Integer> checkins = new ArrayList<>();
-    protected HashMap<Integer, LatLng> unitPoints = new HashMap<>();
     protected HashMap<Integer, Integer> routeSession = new HashMap<>();
     protected HashMap<Integer, List<LatLng>> updates = new HashMap<>(); // This can be renamed to checkinLocation
-    protected HashMap<Integer, Integer> activeRoutes = new HashMap<>();
     protected int checkinId = 0;
     protected int routeId = 0;
 
@@ -51,30 +48,18 @@ public class BusWatchServiceImplementor implements BusWatchService {
 
     @Override
     public List<LatLng> getUnitPoints(int routeId) {
-        List<LatLng> up = new ArrayList<>();
-        for (Map.Entry<Integer,LatLng> unitPoint : unitPoints.entrySet()) {
+        for (Map.Entry<Integer, List<LatLng>> unitPoint : updates.entrySet()) {
             if(unitPoint.getKey() == routeId) {
-                up.add(unitPoint.getValue());
+                return unitPoint.getValue();
             }
         }
-        return up;
+        return new ArrayList<>();
     }
 
     @Override
-    public boolean receiveUpdate(int checkinId, List<LatLng> latlng) {
-        updates.put(checkinId, latlng);
+    public boolean receiveUpdate(int checkinId, LatLng latlng) {
+        updates.get(checkinId).add(latlng);
         return true;
-    }
-
-    @Override
-    public List<Integer> getActiveRoutes(int routeId){
-        List<Integer> checkinList = new ArrayList<>();
-        for (Map.Entry<Integer,Integer> route : activeRoutes.entrySet()) {
-            if(route.getKey() == routeId) {
-                checkinList.add(routeId);
-            }
-        }
-        return checkinList;
     }
 
     private boolean inRouteRange(double range, LatLng position, Route r) {
@@ -141,9 +126,7 @@ public class BusWatchServiceImplementor implements BusWatchService {
     @Override
     public int checkin(int routeId, LatLng latlng) {
         checkinId++;
-        checkins.add(checkinId);
         routeSession.put(checkinId, routeId);
-        activeRoutes.put(routeId, checkinId);
         List<LatLng> checkinLocation = new ArrayList<>();
         checkinLocation.add(latlng);
         updates.put(checkinId, checkinLocation);
@@ -152,10 +135,16 @@ public class BusWatchServiceImplementor implements BusWatchService {
     }
 
     @Override
-    public boolean checkout(int checkinId) {
-        checkins.remove(checkinId);
+    public boolean checkout(int checkinId, double securityScore, double serviceScore, double comfortScore, double overalScore, double conditionScore) {
+        Route r = rutas.get(routeSession.get(checkinId));
+        r.addPath(updates.get(checkinId));
+        r.setComfortScore(comfortScore);
+        r.setUnitScore(conditionScore);
+        r.setSecurityScore(securityScore);
+        r.setServiceScore(serviceScore);
+        r.setOverallScore(overalScore);
         routeSession.remove(checkinId);
-        activeRoutes.remove(checkinId);
+        updates.remove(checkinId);
         return true;
     }
 

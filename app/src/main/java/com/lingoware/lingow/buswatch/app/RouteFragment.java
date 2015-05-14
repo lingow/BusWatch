@@ -21,7 +21,9 @@ import com.lingoware.lingow.buswatch.common.beans.Route;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lingow on 2/05/15.
@@ -31,7 +33,7 @@ public class RouteFragment extends Fragment {
 
     private static final String RUTA = "com.lingoware.lingow.buswatch.app.RouteFragment.ROUTE";
     private static final String CHECKEDINMODE = "com.lingoware.lingow.buswatch.app.RouteFragment.CHECKEDINMODE";
-    ;
+
 
     int ratingStarsIds[] = {
             R.id.starsRouteRating,
@@ -187,8 +189,16 @@ public class RouteFragment extends Fragment {
             LayerDrawable stars = (LayerDrawable) r.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.starFullySelected), PorterDuff.Mode.SRC_ATOP);
             stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.starPartiallySelected), PorterDuff.Mode.SRC_ATOP);
-            if (r.getId() != R.id.starsRouteRating)
+            if (r.getId() != R.id.starsRouteRating) {
+                r.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                    @Override
+                    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                        ratingBar.setRating(rating);
+                    }
+                });
                 stars.getDrawable(0).setColorFilter(getResources().getColor(R.color.starNotSelected), PorterDuff.Mode.SRC_ATOP);
+
+            }
         }
     }
 
@@ -220,5 +230,15 @@ public class RouteFragment extends Fragment {
                             "Exiting without doing anything");
             }
         }
+    }
+
+    public Map<Integer, Float> getRatings() {
+        Map<Integer, Float> ret = new HashMap<>();
+        for (RatingBar r : ratingBars) {
+            if (r.getId() != R.id.starsRouteRating) {
+                ret.put(r.getId(), r.getRating());
+            }
+        }
+        return ret;
     }
 }

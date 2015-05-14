@@ -42,6 +42,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         View.OnClickListener, AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener,
@@ -303,7 +304,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         MainActivity.this.location = location;
                         MainActivity.this.marker.setPosition(
                                 new LatLng(location.getLatitude(), location.getLongitude()));
-                        //TODO Aqui hay qué hacer el update de el checkin
+                        BuswatchServiceHolder.getInstance().getService().receiveUpdate(checkedInId,
+                                new com.lingoware.lingow.buswatch.common.util.LatLng(
+                                        location.getLatitude(), location.getLongitude()
+                                ));
                     }
                 });
 
@@ -313,12 +317,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         marker.getPosition().latitude, marker.getPosition().longitude));
                 break;
             case R.id.btnCheckout:
+                Map<Integer, Float> ratings = currentRouteFragment.getRatings();
                 setCheckedOutMode();
 
                 loader.stopUpdates();
-
-                BuswatchServiceHolder.getInstance().getService().checkout(checkedInId);
+                BuswatchServiceHolder.getInstance().getService().checkout(checkedInId,
+                        ratings.get(R.id.SecurityStars),
+                        ratings.get(R.id.serviceStars),
+                        ratings.get(R.id.comfortStars),
+                        ratings.get(R.id.overallStars),
+                        ratings.get(R.id.conditionStars)
+                );
                 checkedInId = -1;
+                reloadSlidingPanel(marker.getPosition());
             default:
         }
     }
@@ -417,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void routesUpdated(List<Route> routes) {
         this.routes = routes;
-        generateBuses();
         addPolylines();
         addBuses();
     }
@@ -452,10 +462,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-    }
-
-    private void generateBuses() {
-        //TODO Falta generar iconos de autobuses de distintos colores para cada ruta
     }
 
     @Override

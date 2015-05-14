@@ -41,17 +41,14 @@ public interface BusWatchService {
     public abstract int checkin(int routeId, LatLng latlng);
 
     @WebMethod(action = "checkout", operationName = "checkout")
-    public abstract boolean checkout(int checkinId);
+    public abstract boolean checkout(int checkinId, double securityScore, double serviceScore,
+                                     double comfortScore, double overalScore, double conditionScore);
 
     @WebMethod(action = "getUnitPoints", operationName = "getUnitPoints")
     @WebResult(name = "unitPoints")
     public abstract List<LatLng> getUnitPoints(int routeId);
 
     @WebMethod(action = "receiveUpdate", operationName = "receiveUpdate")
-    public abstract boolean receiveUpdate(int checkinId, List<LatLng> latlng);
-
-    @WebMethod(action = "getActiveCheckins", operationName = "getActiveCheckins")
-    @WebResult(name = "activeRoutes")
-    public abstract List<Integer> getActiveRoutes(int routeId);
+    public abstract boolean receiveUpdate(int checkinId, LatLng latlng);
 
 }
