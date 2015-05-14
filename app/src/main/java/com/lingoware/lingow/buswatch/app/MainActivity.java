@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +40,7 @@ import com.lingoware.lingow.buswatch.common.beans.Route;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     int selectedRoutePage;
     RouteFragmentAdapter routeFragmentAdapter;
     LocationLoader loader;
-    List<Marker> busMarkers = new ArrayList<>();
+    Map<Integer, List<Marker>> busMarkers = new HashMap<>();
     private MapFragment mMapFragment;
-    private List<Route> routes;
+    private List<Route> routes = new ArrayList<>();
     private List<Polyline> polylines = new ArrayList<>();
     private int checkinFrequency;
     private int syncFrequency;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mHandler.postDelayed(mStatusChecker, syncFrequency);
         }
     };
-    private int selectedRouteid = 0;
+    private int selectedRouteid = -1;
 
     boolean mapset() {
         return marker != null;
@@ -179,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         trySetupMap();
+        startRepeatingTask();
     }
 
     /**
@@ -349,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private BitmapDescriptor coloredBusIcon(Route r) {
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_bus);
+        /*
         int[] pixels = new int[b.getHeight() * b.getWidth()];
 
         b.getPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
@@ -361,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         b.setPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
 
+        */
         return BitmapDescriptorFactory.fromBitmap(b);
     }
 
@@ -390,14 +393,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 panel.setTouchEnabled(false);
                 addPolylines();
+                hideBuses();
+                for (Route r : routes) {
+                    showBuses(r);
+                }
                 break;
             default:
                 panel.setTouchEnabled(true);
                 cleanPolylines();
+                hideBuses();
                 addRouteToMap(currentRouteFragment.route);
                 if (checkedInId != -1) {
                     setCheckedInMode();
                 }
+
         }
     }
 
@@ -429,10 +438,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void routesUpdated(List<Route> routes) {
         this.routes = routes;
         addPolylines();
-        addBuses();
-    }
-
-    private void addBuses() {
     }
 
     private void addPolylines() {
@@ -461,6 +466,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         }
+        showBuses(r);
 
     }
 
@@ -471,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             this.checkinFrequency = Integer.parseInt(sharedPreferences.getString(key,
                     getResources().getString(R.string.pref_checkin_frequency_default)));
         } else if (key.equals(getResources().getString(R.string.pref_sync_frequency))) {
-            this.syncFrequency = Integer.parseInt(sharedPreferences.getString(key,
+            this.syncFrequency = 1000 * Integer.parseInt(sharedPreferences.getString(key,
                     getResources().getString(R.string.pref_sync_frequency_default)));
         } else if (key.equals(getResources().getString(R.string.pref_route_seek_range))) {
             this.routeSeekRange = Integer.parseInt(sharedPreferences.getString(key,
@@ -479,21 +485,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void updateUnitPositions() {
-        for (Marker m : busMarkers) {
-            m.remove();
-        }
-        for (Route r : routes) {
-            List<com.lingoware.lingow.buswatch.common.util.LatLng> routePoints =
-                    BuswatchServiceHolder.getInstance().getService().getUnitPoints(r.getId());
-            for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : routePoints) {
-                busMarkers.add(mMap.addMarker(
-                        new MarkerOptions()
-                                .icon(coloredBusIcon(r))
-                                .position(new LatLng(latLng.latitude, latLng.longitude))));
+    private void showBuses(Route r) {
+        if (busMarkers.containsKey(r.getId())) {
+            for (Marker m : busMarkers.get(r.getId())) {
+                m.setVisible(true);
             }
         }
+    }
 
+    private void hideBuses() {
+        for (List<Marker> markers : busMarkers.values()) {
+            for (Marker m : markers) {
+                m.setVisible(false);
+            }
+        }
+    }
+
+    private void updateUnitPositions() {
+        if (routes != null) {
+            for (List<Marker> markers : busMarkers.values()) {
+                for (Marker m : markers) {
+                    m.remove();
+                }
+            }
+            for (Route r : routes) {
+                generateBuses(r);
+            }
+        }
+    }
+
+    private void generateBuses(Route r) {
+        busMarkers.put(r.getId(), new ArrayList<Marker>());
+        List<com.lingoware.lingow.buswatch.common.util.LatLng> routePoints =
+                BuswatchServiceHolder.getInstance().getService().getUnitPoints(r.getId());
+        for (com.lingoware.lingow.buswatch.common.util.LatLng latLng : routePoints) {
+            busMarkers.get(r.getId()).add(mMap.addMarker(
+                    new MarkerOptions()
+                            .icon(coloredBusIcon(r))
+                            .position(new LatLng(latLng.latitude, latLng.longitude))));
+        }
     }
 
     void startRepeatingTask() {

@@ -545,6 +545,7 @@ public class MockService extends BusWatchServiceImplementor {
         path.add(new LatLng(20.640900000000002, -103.44814000000001));
         ruta.addPath(path);
         addRoute(ruta);
+        checkin(ruta.getId(), new LatLng(20.62404, -103.43729));
         /*
         ruta = new Route(i++,"626 Vía 4",Math.random()*5,Math.random()*5,Math.random()*5,Math.random()*5,Math.random()*5); List<LatLng> path = new ArrayList<>();
         path.add(new LatLng(20.64234,-103.44814000000001,j++);
